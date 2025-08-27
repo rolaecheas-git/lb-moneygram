@@ -1,0 +1,457 @@
+openapi: 3.0.1
+info:
+  title: Loan flow for the Java archetype - Ficohsa
+  description: API for loan orchestration in the archetype
+  termsOfService: https://grupoficohsa.com/
+  contact:
+    name: Vicepresidencia de Tecnología y Digital - Ficohsa Banco
+    url: https://grupoficohsa.com/
+    email: vicepresidenciadetecnologiaydigital@grupoficohsa.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: https://nova-apim-gw.qa.grupoficohsa.local/loan/v1
+    description: URL for APIM testing
+  - url: https://qa-nova-gw.grupoficohsa.com/loan/v1
+    description: URL for Gateway testing
+paths:
+  /initiate:
+    post:
+      tags:
+        - Loan - Archetype Java Spring Boot
+      summary: Loans are stored in the database.
+      description: The loan data is created in the database and the created object is returned.
+      operationId: createLoan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanDto'
+        required: true
+      responses:
+        '200':
+          description: Record created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanResponseDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '400'
+                status: ERROR
+                message: Bad Request - Invalid request data or missing required parameters.
+                data:
+                  errorDetails:
+                    code: 400 BAD_REQUEST
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: 'Invalid request data or missing required parameters: + parametersError'
+                timestamp: '2025-02-17T09:23:28.4780715-05:00'
+                transactionId: '123'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '401'
+                status: ERROR
+                message: Unauthorized - Missing or invalid credentials, or expired token.
+                data:
+                  errorDetails:
+                    code: 401 UNAUTHORIZED
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: No autorizado. Token de acceso inválido o ausente.
+                timestamp: '2025-02-17T09:24:28.4780715-05:00'
+                transactionId: '456'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '403'
+                status: ERROR
+                message: Forbidden - Insufficient permissions for authenticity evaluation.
+                data:
+                  errorDetails:
+                    code: 403 FORBIDDEN
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Acceso denegado. No tienes los permisos necesarios.
+                timestamp: '2025-02-17T09:25:28.4780715-05:00'
+                transactionId: '789'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '404'
+                status: ERROR
+                message: Not Found - No data found for the data provided.
+                data:
+                  errorDetails:
+                    code: 404 NOT_FOUND
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: El depósito a plazo fijo no fue encontrado.
+                timestamp: '2025-02-17T09:26:28.4780715-05:00'
+                transactionId: '321'
+        '408':
+          description: Request Timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '408'
+                status: ERROR
+                message: Request Timeout - The request exceeded the configured timeout.
+                data:
+                  errorDetails:
+                    code: 408 REQUEST_TIMEOUT
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Tiempo de espera agotado. Intenta nuevamente.
+                timestamp: '2025-02-17T09:27:28.4780715-05:00'
+                transactionId: '654'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '409'
+                status: ERROR
+                message: Conflict - Request conflicts with the current resource state (e.g., duplicate creation).
+                data:
+                  errorDetails:
+                    code: 409 CONFLICT
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Conflicto detectado en el procesamiento de la solicitud.
+                timestamp: '2025-02-17T09:28:28.4780715-05:00'
+                transactionId: '987'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '500'
+                status: ERROR
+                message: Internal Server Error - Unexpected server error preventing request completion.
+                data:
+                  errorDetails:
+                    code: 500 INTERNAL_SERVER_ERROR
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Error interno del servidor. Intenta más tarde.
+                timestamp: '2025-02-17T09:29:28.4780715-05:00'
+                transactionId: '741'
+        '504':
+          description: Gateway Timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '504'
+                status: ERROR
+                message: Gateway Timeout - Gateway timed out at the limit set in APIM.
+                data:
+                  errorDetails:
+                    code: 504 GATEWAY_TIMEOUT
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Tiempo de espera agotado en la pasarela de red.
+                timestamp: '2025-02-17T09:30:28.4780715-05:00'
+                transactionId: '852'
+  /{id}/get-loan-by-id/retrieve:
+    get:
+      tags:
+        - Loan - Archetype Java Spring Boot
+      summary: Obtain information on loans
+      description: Returns information about a loan
+      operationId: getLoanById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the loan in the table DB
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data details successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanResponseDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '400'
+                status: ERROR
+                message: Bad Request - Invalid request data or missing required parameters.
+                data:
+                  errorDetails:
+                    code: 400 BAD_REQUEST
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: 'Invalid request data or missing required parameters: + parametersError'
+                timestamp: '2025-02-17T09:23:28.4780715-05:00'
+                transactionId: '123'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '401'
+                status: ERROR
+                message: Unauthorized - Missing or invalid credentials, or expired token.
+                data:
+                  errorDetails:
+                    code: 401 UNAUTHORIZED
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: No autorizado. Token de acceso inválido o ausente.
+                timestamp: '2025-02-17T09:24:28.4780715-05:00'
+                transactionId: '456'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '403'
+                status: ERROR
+                message: Forbidden - Insufficient permissions for authenticity evaluation.
+                data:
+                  errorDetails:
+                    code: 403 FORBIDDEN
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Acceso denegado. No tienes los permisos necesarios.
+                timestamp: '2025-02-17T09:25:28.4780715-05:00'
+                transactionId: '789'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '404'
+                status: ERROR
+                message: Not Found - No data found for the data provided.
+                data:
+                  errorDetails:
+                    code: 404 NOT_FOUND
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: El depósito a plazo fijo no fue encontrado.
+                timestamp: '2025-02-17T09:26:28.4780715-05:00'
+                transactionId: '321'
+        '408':
+          description: Request Timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '408'
+                status: ERROR
+                message: Request Timeout - The request exceeded the configured timeout.
+                data:
+                  errorDetails:
+                    code: 408 REQUEST_TIMEOUT
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Tiempo de espera agotado. Intenta nuevamente.
+                timestamp: '2025-02-17T09:27:28.4780715-05:00'
+                transactionId: '654'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '409'
+                status: ERROR
+                message: Conflict - Request conflicts with the current resource state (e.g., duplicate creation).
+                data:
+                  errorDetails:
+                    code: 409 CONFLICT
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Conflicto detectado en el procesamiento de la solicitud.
+                timestamp: '2025-02-17T09:28:28.4780715-05:00'
+                transactionId: '987'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '500'
+                status: ERROR
+                message: Internal Server Error - Unexpected server error preventing request completion.
+                data:
+                  errorDetails:
+                    code: 500 INTERNAL_SERVER_ERROR
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Error interno del servidor. Intenta más tarde.
+                timestamp: '2025-02-17T09:29:28.4780715-05:00'
+                transactionId: '741'
+        '504':
+          description: Gateway Timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                statusCode: '504'
+                status: ERROR
+                message: Gateway Timeout - Gateway timed out at the limit set in APIM.
+                data:
+                  errorDetails:
+                    code: 504 GATEWAY_TIMEOUT
+                    fields:
+                      exceptionType: ApiException
+                      exceptionMessage: Tiempo de espera agotado en la pasarela de red.
+                timestamp: '2025-02-17T09:30:28.4780715-05:00'
+                transactionId: '852'
+components:
+  schemas:
+    LoanDto:
+      required:
+        - amount
+        - endDate
+        - interestRate
+        - loanId
+        - startDate
+      type: object
+      properties:
+        loanId:
+          type: string
+          description: Unique identifier of the loan.
+          example: LN-102938
+        amount:
+          type: number
+          description: Requested loan amount. Must be a positive number.
+          format: double
+          example: 50000
+        interestRate:
+          type: number
+          description: Annual interest rate for the loan. Must be positive.
+          format: double
+          example: 5.25
+        startDate:
+          type: string
+          description: Loan start date in ISO format.
+          format: date
+          example: '2024-01-01'
+        endDate:
+          type: string
+          description: Loan end date (maturity). Must be after the start date.
+          format: date
+          example: '2029-01-01'
+      description: Data Transfer Object used to create or update a loan request.
+    LoanResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: string
+          description: HTTP status code as string
+          example: '200'
+        status:
+          type: string
+          description: Status indicator of the response
+          example: SUCCESS
+        message:
+          type: string
+          description: Response message
+          example: OK - The request was successfully executed.
+        data:
+          type: object
+          description: Information returned according to the objectype flow
+        timestamp:
+          type: string
+          description: Timestamp of the response
+          example: '2025-05-17T15:03:00'
+        transactionId:
+          type: string
+          description: Transaction identifier for traceability
+          example: abcd1234
+      description: Contains the generic management response to the loan
+    ApiErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: string
+          description: HTTP status code as string
+          example: '400'
+        status:
+          type: string
+          description: Status of the response
+          example: ERROR
+        message:
+          type: string
+          description: Human-readable error message
+          example: El campo X es obligatorio
+        data:
+          $ref: '#/components/schemas/ErrorData'
+        timestamp:
+          type: string
+          description: Timestamp of the error in ISO format
+          example: '2025-05-17T12:34:56'
+        transactionId:
+          type: string
+          description: Transaction ID for traceability
+          example: f9d3-789f-123f-888f
+      description: Standard error response structure.
+    ErrorData:
+      type: object
+      properties:
+        errorDetails:
+          $ref: '#/components/schemas/ErrorDetails'
+      description: Wrapper object for the error details section.
+    ErrorDetails:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Internal error code identifier
+          example: EXCEPTION_ERROR
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+            description: Map of fields with related error messages.
+          description: Map of fields with related error messages.
+      description: Detailed error information.

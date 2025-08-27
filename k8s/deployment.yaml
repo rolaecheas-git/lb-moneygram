@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-transfer-deployment
+  namespace: poc
+  labels:
+    app: ms-transfer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-transfer
+  template:
+    metadata:
+      labels:
+        app: ms-transfer
+    spec:
+      containers:
+        - name: ms-transfer
+          image: 219967434577.dkr.ecr.us-east-1.amazonaws.com/ms-transfer:latest
+          imagePullPolicy: Always  # Never (for local testing with k3s/k3d or other)
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: ms-transfer-configmap
+          env:
+            - name: SERVER_PORT
+              value: "8087"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "http://localhost:8087/api/notifications"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8086
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8086
+            initialDelaySeconds: 5
+            periodSeconds: 5

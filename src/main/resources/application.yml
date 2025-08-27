@@ -1,0 +1,93 @@
+server:
+  port: ${SERVER_PORT:8083}
+  servlet:
+    context-path: /
+user:
+  api:
+    url: https://zoojup1uai.execute-api.us-east-2.amazonaws.com/Prod/users/
+
+reference:
+  service:
+    url: ${NOTIFICATION_SERVICE_URL:https://awnnq60x9j.execute-api.us-east-2.amazonaws.com/Prod/status/v1/transactions}
+
+spring:
+  application:
+    name: ms-transfer
+  
+  datasource:
+    url: jdbc:h2:mem:transferdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+  api-docs:
+    path: /api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  resources:
+    cache-refresh-time-seconds: 3600
+
+logging:
+  level:
+    com.mercantil.operationsandexecution: DEBUG
+    org.springframework.web: DEBUG
+
+rest:
+  allowed-host:
+    host-name: localhost,127.0.0.1
+
+soap:
+  security:
+    password: default-password
+    keystore-path: classpath:keystore.jks
+    keystore-password: keystore-password
+    keystore-type: JKS
+    key-alias: client
+    key-password: key-password
+    truststore-path: classpath:truststore.jks
+    truststore-password: truststore-password
+    truststore-type: JKS
+
+notification:
+  service:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8080}
+
+# AWS Configuration
+aws:
+  region: ${AWS_REGION:us-east-1}
+  secretsmanager:
+    enabled: ${AWS_SECRETS_ENABLED:false}
+
+# Kafka Configuration
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  consumer:
+    group-id: ${KAFKA_CONSUMER_GROUP:transfer-group}
+    auto-offset-reset: earliest
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.apache.kafka.common.serialization.StringSerializer

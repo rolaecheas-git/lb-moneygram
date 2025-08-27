@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-transfer-configmap
+  namespace: poc
+data:
+  SPRING_APPLICATION_NAME: "ms-transfer"
+  SPRING_DATASOURCE_URL: "jdbc:h2:mem:transferdb"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.h2.Driver"
+  SPRING_DATASOURCE_USERNAME: "sa"
+  SPRING_DATASOURCE_PASSWORD: "password"
+  SPRING_H2_CONSOLE_ENABLED: "true"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "create-drop"
+  SPRING_JPA_SHOW_SQL: "true"
+  NOTIFICATION_SERVICE_URL: "http://localhost:8081"
