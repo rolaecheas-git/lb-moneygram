@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "reference.service")
 public class ReferenceApiProperties {
-    private String url;
+    private String urlApi;
 }

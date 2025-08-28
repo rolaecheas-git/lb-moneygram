@@ -6,7 +6,14 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "user.api")
-public class UserApiProperties {
-    private String url;
+@ConfigurationProperties(prefix = "token")
+public class TokenApiProperties {
+    private String clientId;
+    private String clientToken;
+    private Service service;
+
+    @Data
+    public static class Service {
+        private String urlToken;
+    }
 }
