@@ -13,6 +13,6 @@ public class RequestInfoService implements RequestInfoUseCase {
     @Override
     public ReferenceNumberRequest process(ReferenceNumberRequest requestInfoDto) {
         log.info("Request received: {}", requestInfoDto);
-        return requestInfoDto; // simplemente devuelve lo recibido
+        return requestInfoDto;
     }
 }

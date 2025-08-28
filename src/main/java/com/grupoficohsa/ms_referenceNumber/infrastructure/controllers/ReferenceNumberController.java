@@ -6,46 +6,39 @@ import com.grupoficohsa.ms_referenceNumber.application.usecases.ReferenceNumberU
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/reference")
+@RequestMapping("/transactions")
 @RequiredArgsConstructor
 @Slf4j
 public class ReferenceNumberController {
 
     private final ReferenceNumberUseCase useCase;
+   
+    @GetMapping("/{referenceNumber}")
+    public Mono<ResponseEntity<ReferenceNumberResponse>> getTransactionByReferenceNumber(
+            @RequestHeader(name = "idTransaction", required = true) String idTransaction,
+            @PathVariable("referenceNumber") String referenceNumber,
+            @RequestHeader HttpHeaders headers
+    ) {
+        log.info("[ID_TRANSACTION:{}] INICIO GET /transactions/{}", idTransaction, referenceNumber);
 
-    @GetMapping
-    public Mono<ReferenceNumberResponse> getReferenceNumber(
-            @RequestHeader HttpHeaders headers,
-            ReferenceNumberRequest request) {
-
-        String idTransaction = headers.getFirst("idTransaction");
-
-        if (idTransaction == null || idTransaction.isBlank()) {
-            log.error("Header 'idTransaction' is missing or empty. No se puede procesar la transacción.");
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Header 'idTransaction' is required"
-            );
-        }
-
-        log.info("[ID_TRANSACTION:{}]  INICIO METODO referenceNumber", idTransaction);
-
-        log.debug("[ID_TRANSACTION:{}] Request recibido -> {}", idTransaction, request);
+        ReferenceNumberRequest request = ReferenceNumberRequest.builder()
+                .referenceNumber(referenceNumber)
+                .build();
 
         headers.set("idTransaction", idTransaction);
 
         return useCase.execute(headers, request)
-                .doOnSuccess(response -> 
-                        log.info("[ID_TRANSACTION:{}] FIN METODO referenceNumber. Respuesta OK -> {}", 
-                                 idTransaction, response))
-                .doOnError(error -> 
-                        log.error("[ID_TRANSACTION:{}] Error en metodo referenceNumber -> {}", 
-                                  idTransaction, error.getMessage(), error));
+                .map(ResponseEntity::ok)
+                .doOnSuccess(resp ->
+                        log.info("[ID_TRANSACTION:{}] FIN GET /transactions/{} -> OK",
+                                idTransaction, referenceNumber))
+                .doOnError(error ->
+                        log.error("[ID_TRANSACTION:{}] Error en GET /transactions/{} -> {}",
+                                idTransaction, referenceNumber, error.getMessage(), error));
     }
 }

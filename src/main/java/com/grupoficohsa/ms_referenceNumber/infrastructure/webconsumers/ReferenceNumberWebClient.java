@@ -33,12 +33,9 @@ public class ReferenceNumberWebClient implements ReferenceNumberApiClientPort {
 
         log.info("[ID_TRANSACTION:{}] Preparando llamada a API externa con URL={}", idTransaction, properties.getUrlApi());
 
-        Map<String, String> queryParams = Map.of(
-            "targetAudience", request.getTargetAudience(),
-            "userLanguage", request.getUserLanguage(),
-            "agentPartnerId", request.getAgentPartnerId(),
-            "referenceNumber", request.getReferenceNumber()
-        );
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("referenceNumber", request.getReferenceNumber());
+
         
         Map<String, String> tokenParams = new HashMap<>();
         tokenParams.put("clientId",    tokenProps.getClientId());

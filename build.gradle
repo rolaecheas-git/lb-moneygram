@@ -1,28 +1,33 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.5'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.5.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.grupoficohsa'
 version = '0.0.1-SNAPSHOT'
 description = 'La aplicación puede invocar el punto final Recuperar una transacción para buscar por número de referencia y devolver el estado actual de una transacción.'
 
+jacoco {
+    toolVersion = "0.8.12"
+}
+
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
     mavenLocal()
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
     // Spring Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    
+
     // Spring WebFlux (WebClient)
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
@@ -35,15 +40,33 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-	//MG-Library
+    // MG-Library
     implementation 'com.grupoficohsa:lb-moneygram:0.0.1'
-	
+
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.projectreactor:reactor-test'
+
 }
 
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport 
+}
 
-tasks.named('test') {
-	useJUnitPlatform()
+tasks.jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+    }
+    classDirectories.setFrom(
+        files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                'com/grupoficohsa/ms_referenceNumber/MsReferenceNumberApplication.class'
+            ])
+        })
+    )
 }
